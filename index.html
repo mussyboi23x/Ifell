@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>Just Fall LOL</title>
+    <link href="../../images/ico.ico" rel="shortcut icon">
+    <script src="../../storage/js/cloak.js"></script>
+    <meta charset="utf-8"/>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="noindex,nofollow" name="robots"/>
+    <script>
+        Object.defineProperty(document, "URL", {
+            get() {
+                return "https://justfall.lol/";
+            },
+        });
+    </script>
+    <script src="mobileRedirect.js"></script>
+    <script src="hb.loader.js"></script>
+    <link href="style.css" rel="stylesheet"/>
+    <style>
+        #joystick {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            display: grid;
+            grid-template-rows: auto auto;
+            grid-template-columns: 50px 50px 50px;
+            gap: 5px;
+            justify-items: center;
+            align-items: center;
+        }
+
+        #joystick button {
+            width: 50px;
+            height: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 50%;
+            border: none;
+            background-color: #0078D4;
+            color: white;
+            cursor: pointer;
+        }
+
+        #joystick button:active {
+            background-color: #005A9E;
+        }
+    </style>
+    <script>
+        function injectAdByWindowSize() {
+            // Inject small ad if screen is small, or large ad if screen is large
+        }
+
+        function showAds() {
+            console.log("show ads");
+            document.getElementsByClassName("ad-rectangle-bottom")[0].style.display = "block";
+            document.getElementsByClassName("ad-leaderboard-bottom")[0].style.display = "block";
+            document.getElementById("adRectangleUpper").style.display = "block";
+            refresh();
+        }
+
+        function hideAds() {
+            console.log("hide ads");
+            document.getElementsByClassName("ad-rectangle-bottom")[0].style.display = "none";
+            document.getElementsByClassName("ad-leaderboard-bottom")[0].style.display = "none";
+            document.getElementById("adRectangleUpper").style.display = "none";
+        }
+
+        function refresh() {
+            console.log("refresh ads");
+        }
+
+        window.onfocus = function () {
+            console.log("onfocus");
+            refresh();
+        };
+    </script>
+</head>
+<body>
+<div id="gameContainer"></div>
+<div id="loader">
+    <div class="spinner"></div>
+    <div class="progress">
+        <div class="full"></div>
+    </div>
+</div>
+<div id="joystick">
+    <button id="up">W</button><br>
+    <button id="left">A</button>
+    <button id="down">S</button>
+    <button id="right">D</button>
+</div>
+<script src="fullscreen.js"></script>
+<script id="unity-loader" src="UnityLoader.js"></script>
+<script>
+    var gameJsonUrl = "WebGL.json"; //%gameJsonUrl
+    var urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has("v")) {
+        gameJsonUrl = gameJsonUrl.replace(/[0-9][0-9]+/i, urlParams.get("v"));
+    }
+    var gameInstance = UnityLoader.instantiate("gameContainer", gameJsonUrl, {onProgress: UnityProgress});
+
+    function UnityProgress(gameInstance, progress) {
+        if (!gameInstance.Module) {
+            return;
+        }
+        const loader = document.querySelector("#loader");
+        if (!gameInstance.progress) {
+            const progress = document.querySelector("#loader .progress");
+            progress.style.display = "block";
+            gameInstance.progress = progress.querySelector(".full");
+            loader.querySelector(".spinner").style.display = "none";
+        }
+        gameInstance.progress.style.transform = `scaleX(${progress})`;
+        if (progress === 1 && !gameInstance.removeTimeout) {
+            loader.style.display = "none";
+            gameLoaded = true;
+        }
+    }
+
+    initializeFullscreenEvents();
+
+    document.addEventListener("visibilitychange", function () {
+        if (!gameInstance) return;
+
+        if (document.visibilityState == "hidden") {
+            gameInstance.SendMessage("FocusManager", "ApplicationFocusChangedWebCallback", 0);
+        } else {
+            gameInstance.SendMessage("FocusManager", "ApplicationFocusChangedWebCallback", 1);
+        }
+    });
+
+    window.addEventListener("resize", injectAdByWindowSize);
+
+    document.getElementById('up').addEventListener('click', function() {
+        gameInstance.SendMessage('Controller', 'MoveUp');
+    });
+
+    document.getElementById('left').addEventListener('click', function() {
+        gameInstance.SendMessage('Controller', 'MoveLeft');
+    });
+
+    document.getElementById('down').addEventListener('click', function() {
+        gameInstance.SendMessage('Controller', 'MoveDown');
+    });
+
+    document.getElementById('right').addEventListener('click', function() {
+        gameInstance.SendMessage('Controller', 'MoveRight');
+    });
+</script>
+</body>
+</html>
